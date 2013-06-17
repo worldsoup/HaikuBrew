@@ -8,6 +8,7 @@
 
 #import "NewHomeViewController.h"
 #import "AppDelegate.h"
+
 @interface NewHomeViewController ()
 
 @end
@@ -101,7 +102,7 @@
 }
 
 - (void)openSession
-{
+{    
     [FBSession openActiveSessionWithReadPermissions:nil
                                        allowLoginUI:YES
                                   completionHandler:
@@ -450,17 +451,17 @@
 
 
 #pragma mark -- Facebook SSO Redirect Handlers --
--(BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
-{
-    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-//    return [appDelegate.facebook handleOpenURL:url];
-}
-
--(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
-{
-    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-//    return [appDelegate.facebook handleOpenURL:url];
-}
+//-(BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+//{
+//    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+////    return [appDelegate.facebook handleOpenURL:url];
+//}
+//
+//-(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+//{
+//    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+////    return [appDelegate.facebook handleOpenURL:url];
+//}
 
 
 #pragma mark -- FBRequestDelegate Event Handlers --
@@ -557,7 +558,7 @@
     FacebookLoginViewController *login = [[FacebookLoginViewController alloc] initWithNibName:@"FacebookLoginViewController_iPhone" bundle:nil];
     [login setLoginViewDelegate:self];
     
-    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+//    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 //    [appDelegate.facebook setSessionDelegate:self];
 //    if( ![appDelegate.facebook isSessionValid] )
 //        [self presentModalViewController:login animated:NO];

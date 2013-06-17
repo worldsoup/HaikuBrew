@@ -31,7 +31,6 @@
 
 
 
-
 //Variables
 @property (nonatomic, retain) NSMutableArray *allBrews;
 
@@ -49,6 +48,8 @@
 - (IBAction)pressBtnLogout:(id)sender;
 
 //Methods
+
+
 -(void) refresh;
 - (void) showMessageWithText:(NSString *) textToDisplay;
 - (void) dismissLoadingView;

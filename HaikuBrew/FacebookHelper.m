@@ -12,7 +12,7 @@
 
 
 
-//+ (FacebookHelper *) sharedInstance {
++ (FacebookHelper *) sharedInstance {
 //    static FBSession *_sharedClient = nil;
 //    static dispatch_once_t oncePredicate;
 //    
@@ -20,6 +20,7 @@
 //        _sharedClient = [[FBSession alloc] init];
 //    });
 //    return _sharedClient;
-//}
+    return nil;
+}
 
 @end

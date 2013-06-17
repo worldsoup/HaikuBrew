@@ -67,7 +67,7 @@
     
     
     
-    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+//    AppDelegate *appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
     faceBookRequestType = 0;
     
 //    NSMutableDictionary * params = [NSMutableDictionary dictionaryWithObjectsAndKeys:[appDelegate.facebook accessToken],@"access_token",

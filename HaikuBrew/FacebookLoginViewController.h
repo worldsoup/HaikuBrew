@@ -11,7 +11,7 @@
 
 @protocol LoginViewDelegate <NSObject>
 @optional
-- (void) facebookLoginSuccessful; // called when a registration is complete
+- (void) facebookLoginSuccessful;// called when a registration is complete
 @end
 
 
