@@ -102,7 +102,7 @@
 }
 
 - (void)openSession
-{    
+{
     [FBSession openActiveSessionWithReadPermissions:nil
                                        allowLoginUI:YES
                                   completionHandler:

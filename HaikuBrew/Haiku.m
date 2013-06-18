@@ -91,13 +91,13 @@
 
 - (int) getNextHaikuLineNumber
 {
-    if( ! self.haikuLine1.isComplete )
+    if( !self.haikuLine1.isComplete )
         return 1;
     else if( !self.haikuLine2.isComplete )
         return 2;
     else if( !self.haikuLine3.isComplete )
         return 3;
-    else 
+    else
         return 0;
 }
 

@@ -88,7 +88,7 @@
 #pragma mark -- Facebook SSO Redirect Handlers --
 -(BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
 {
-//    return [self.facebook handleOpenURL:url];
+    return [self.session handleOpenURL:url];
 }
 
 
@@ -105,30 +105,30 @@
 
 
 #pragma mark -- FBRequestDelegate Event Handlers --
-//-(void)request:(FBRequest *)request didReceiveResponse:(NSURLResponse *)response
-//{
-//    NSLog(@"requestdidReceiveResponse:");
-//}
-//
-//-(void)requestLoading:(FBRequest *)request
-//{
-//    NSLog(@"requestLoading:");
-//}
-//
-//-(void)request:(FBRequest *)request didLoad:(id)result
-//{
-//    NSLog(@"requestdidLoad:");
-//}
-//
-//-(void)request:(FBRequest *)request didLoadRawResponse:(NSData *)data
-//{
-//    NSLog(@"requestdidLoadRawResponse:");
-//}
-//
-//-(void)request:(FBRequest *)request didFailWithError:(NSError *)error
-//{
-//    NSLog(@"requestdidFailWithError:");
-//}
+-(void)request:(FBRequest *)request didReceiveResponse:(NSURLResponse *)response
+{
+    NSLog(@"requestdidReceiveResponse:");
+}
+
+-(void)requestLoading:(FBRequest *)request
+{
+    NSLog(@"requestLoading:");
+}
+
+-(void)request:(FBRequest *)request didLoad:(id)result
+{
+    NSLog(@"requestdidLoad:");
+}
+
+-(void)request:(FBRequest *)request didLoadRawResponse:(NSData *)data
+{
+    NSLog(@"requestdidLoadRawResponse:");
+}
+
+-(void)request:(FBRequest *)request didFailWithError:(NSError *)error
+{
+    NSLog(@"requestdidFailWithError:");
+}
 
 
 #pragma mark -- Standard App Delegate --

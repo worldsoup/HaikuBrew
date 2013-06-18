@@ -9,6 +9,7 @@
 #import "SelectFacebookFriendViewController.h"
 #import "AppDelegate.h"
 #import "FacebookUser.h"
+#import <FacebookSDK/FBRequest.h>
 #import "SelectFacebookFriendTableCell.h"
 #import "UIImageView+WebCache.h"
 #import "UIImage+StackBlur.h"
@@ -79,10 +80,68 @@ typedef enum selectFacebookPageStatust {
 
 - (void) reloadFriendsFromFacebook
 {
-//    [self showLoadingWithLabel:@"Loading Friends"];
+    [self showLoadingWithLabel:@"Loading Friends"];
 //    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    
-//    [appDelegate.facebook requestWithGraphPath:@"me/friends?fields=first_name,last_name,installed" andDelegate:self];
+
+    NSString *pRequestString = @"me/friends?fields=first_name,last_name,installed";
+    
+    [[FBRequest requestForGraphPath:pRequestString ] startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        if(!error)
+        {
+            NSArray *items = [(NSDictionary *)result objectForKey:@"data"];
+            self.friendsUsingAppList = [[NSMutableArray alloc] initWithObjects: nil];
+            self.friendsNotUsingAppList = [[NSMutableArray alloc] initWithObjects: nil];
+            for (int i=0; i<[items count]; i++) {
+                NSDictionary *friend = [items objectAtIndex:i];
+                NSString *fbid = [friend objectForKey:@"id"];
+                NSString *first_name = [friend objectForKey:@"first_name"];
+                NSString *last_name = [friend objectForKey:@"last_name"];
+                BOOL isInstalled = [(NSNumber *)[friend objectForKey: @"installed"] boolValue];
+                
+                FacebookUser *user = [[FacebookUser alloc] init];
+                [user setFirst_name:first_name];
+                [user setLast_name:last_name];
+                [user setUserId:fbid];
+                [user setIsUsingApp:isInstalled];
+                
+                if(isInstalled)
+                    [self.friendsUsingAppList addObject:user];
+                else
+                    [self.friendsNotUsingAppList addObject:user];
+                
+            }
+            
+            [self.friendsUsingAppList sortUsingComparator:
+             ^(FacebookUser *obj1, FacebookUser *obj2)
+             {
+                 NSString* key1 = obj1.first_name;
+                 NSString* key2 = obj2.first_name;
+                 return [key1 compare: key2];
+             }];
+            
+            [self.friendsNotUsingAppList sortUsingComparator:
+             ^(FacebookUser *obj1, FacebookUser *obj2)
+             {
+                 NSString* key1 = obj1.first_name;
+                 NSString* key2 = obj2.first_name;
+                 return [key1 compare: key2];
+             }];
+            
+            self.searchedTableData = [self getCurrentListOfFriends];
+            [self dismissLoading];
+            [self.table reloadData];
+        }
+        else
+        {
+            //    [self hideActivityIndicator];
+            NSLog(@"Error message: %@", [[error userInfo] objectForKey:@"error_msg"]);
+            //[self showMessage:@"Oops, something went haywire."];
+            [self.spinnerViewController showSpinnerWithMessage:@"Trying Facebook again..."];
+            [self reloadFriendsFromFacebook];
+
+        }
+    }];
+//    [FBRequest requestWithGraphPath:@"me/friends?fields=first_name,last_name,installed" andDelegate:self];
 }
 
 - (void)viewDidUnload
@@ -208,76 +267,6 @@ typedef enum selectFacebookPageStatust {
     }
     [self.table reloadData];
 }
-
-//
-//#pragma mark - FBRequestDelegate Methods
-///**
-// * Called when the Facebook API request has returned a response. This callback
-// * gives you access to the raw response. It's called before
-// * (void)request:(FBRequest *)request didLoad:(id)result,
-// * which is passed the parsed response object.
-// */
-//- (void)request:(FBRequest *)request didReceiveResponse:(NSURLResponse *)response {
-//    NSLog(@"received response");
-//}
-//
-//- (void)request:(FBRequest *)request didLoad:(id)result {
-//    //ok so it's a dictionary with one element (key="data"), which is an array of dictionaries, each with "name" and "id" keys
-//    NSArray *items = [(NSDictionary *)result objectForKey:@"data"];
-//    self.friendsUsingAppList = [[NSMutableArray alloc] initWithObjects: nil];
-//    self.friendsNotUsingAppList = [[NSMutableArray alloc] initWithObjects: nil];
-//    for (int i=0; i<[items count]; i++) {
-//        NSDictionary *friend = [items objectAtIndex:i];
-//        NSString *fbid = [friend objectForKey:@"id"];
-//        NSString *first_name = [friend objectForKey:@"first_name"];
-//        NSString *last_name = [friend objectForKey:@"last_name"];
-//        BOOL isInstalled = [(NSNumber *)[friend objectForKey: @"installed"] boolValue];
-//
-//        FacebookUser *user = [[FacebookUser alloc] init];
-//        [user setFirst_name:first_name];
-//        [user setLast_name:last_name];
-//        [user setUserId:fbid];
-//        [user setIsUsingApp:isInstalled];
-//        
-//        if(isInstalled)
-//            [self.friendsUsingAppList addObject:user];
-//        else
-//            [self.friendsNotUsingAppList addObject:user];
-//        
-//    }
-//    
-//    [self.friendsUsingAppList sortUsingComparator: 
-//     ^(FacebookUser *obj1, FacebookUser *obj2) 
-//     {
-//         NSString* key1 = obj1.first_name;
-//         NSString* key2 = obj2.first_name;
-//         return [key1 compare: key2];
-//     }];
-//    
-//    [self.friendsNotUsingAppList sortUsingComparator: 
-//     ^(FacebookUser *obj1, FacebookUser *obj2) 
-//     {
-//         NSString* key1 = obj1.first_name;
-//         NSString* key2 = obj2.first_name;
-//         return [key1 compare: key2];
-//     }];
-//    
-//    self.searchedTableData = [self getCurrentListOfFriends];
-//    [self dismissLoading];
-//    [self.table reloadData];
-//}
-///**
-// * Called when an error prevents the Facebook API request from completing
-// * successfully.
-// */
-//- (void)request:(FBRequest *)request didFailWithError:(NSError *)error {
-////    [self hideActivityIndicator];
-//    NSLog(@"Error message: %@", [[error userInfo] objectForKey:@"error_msg"]);
-////    [self showMessage:@"Oops, something went haywire."];
-//    [self.spinnerViewController showSpinnerWithMessage:@"Trying Facebook again..."];
-//    [self reloadFriendsFromFacebook];
-//}
-
 
 #pragma mark - UITableViewDatasource and UITableViewDelegate Methods
 
@@ -430,6 +419,7 @@ typedef enum selectFacebookPageStatust {
 
 - (void) friendSelected:(FacebookUser *) facebookUser
 {
+    NSLog(@"%d",[self.haiku getNextHaikuLineNumber]);
     if([self.haiku getNextHaikuLineNumber] == 1)
     {
         self.haiku.haikuLine2 = [[HaikuLine alloc] init];
@@ -446,14 +436,12 @@ typedef enum selectFacebookPageStatust {
         [self.haiku.haikuLine3 setFirstName:facebookUser.first_name];
         [self.haiku.haikuLine3 setLastName:facebookUser.last_name];
     }
-    
 
     [self submitHaiku];
 }
 
 - (void)submitHaiku
 {
-    
     GetBaseDataManager *manager = [[GetBaseDataManager alloc] init];
     
     if(self.isUpdate)
@@ -478,16 +466,26 @@ typedef enum selectFacebookPageStatust {
  * that are currently using the app.
  */
 - (void)sendToExistingUsers:(NSArray *)selectIDs {
-//    NSString *selectIDsStr = [selectIDs componentsJoinedByString:@","];
-//    NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-//                                   @"It's your turn to write a line for this Haiku.",  @"message",
-//                                   selectIDsStr, @"suggestions",
-//                                   nil];
-//    
+    NSString *selectIDsStr = [selectIDs componentsJoinedByString:@","];
+    NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"It's your turn to write a line for this Haiku.",  @"message",
+                                   selectIDsStr, @"suggestions",
+                                   nil];
+    
 //    AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    [[delegate facebook] dialog:@"newsfeed"
-//                      andParams:params
-//                    andDelegate:self];
+    [[FBRequest requestWithGraphPath: @"newsfeed"
+                         parameters: params
+                         HTTPMethod: @"POST"]startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        if(!error)
+        {
+            postToFacebookSuccess = true;
+            [self showConfirmMessage:@"Your Haiku has been Brewed!" withColor:[UIColor greenColor]];
+        }
+        else {
+        postToFacebookSuccess = false;
+            [self showConfirmMessage:@"Facebook Request has not been sent" withColor:[UIColor yellowColor]];
+        }
+    }];
 }
 
 /*
@@ -498,20 +496,51 @@ typedef enum selectFacebookPageStatust {
     if([user isUsingApp])
     {
         messageTouser = @"You have a Haiku Brewing!!  Write the next line now!!";
+        NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                       messageTouser,  @"message",
+                                       user.userId, @"to",
+                                       @"1",@"frictionless",
+                                       nil];
+        [params setObject: @"1" forKey:@"frictionless"];
+        //    AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        [[FBRequest requestWithGraphPath: @"me/apprequests"
+                              parameters: params
+                              HTTPMethod: @"POST"] startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+            NSLog(@"%@",error);
+            if(!error)
+            {
+                postToFacebookSuccess = true;
+                [self showConfirmMessage:@"Your Haiku has been Brewed!" withColor:[UIColor greenColor]];
+            }
+            else {
+                postToFacebookSuccess = false;
+                [self showConfirmMessage:@"Facebook Request has not been sent" withColor:[UIColor yellowColor]];
+            }
+        }];
     }
-    else {
+    else
+    {
         messageTouser = @"Let's Brew a Haiku together!!";
+        NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:user.userId, @"to",nil];
+        
+        [FBWebDialogs
+         presentRequestsDialogModallyWithSession:nil
+         message:messageTouser
+         title:nil
+         parameters:params
+         handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+             if (error) {
+                 postToFacebookSuccess = false;
+                 [self showConfirmMessage:@"Facebook Request has not been sent" withColor:[UIColor yellowColor]];
+                 // Error launching the dialog or sending the request.
+                 NSLog(@"Error sending request.");
+             } else {
+                     NSLog(@"Request sent.");
+                     postToFacebookSuccess = true;
+                     [self showConfirmMessage:@"Your Haiku has been Brewed!" withColor:[UIColor greenColor]];
+                 }
+         }];
     }
-    NSMutableDictionary* params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   messageTouser,  @"message",
-                                   user.userId, @"to",
-                                   @"1",@"frictionless", 
-                                   nil];
-    [params setObject: @"1" forKey:@"frictionless"];
-//    AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-//    [[delegate facebook] dialog:@"apprequests"
-//                      andParams:params
-//                    andDelegate:self];
 }
 
 
@@ -578,62 +607,6 @@ typedef enum selectFacebookPageStatust {
         [self.navigationController popToRootViewControllerAnimated:YES];
     }
 }
-
-
-//#pragma mark -- FBDialogDelegate Event Handlers --
-//-(void)dialogDidComplete:(FBDialog *)dialog
-//{
-//    NSLog(@"dialogDidComplete:");
-//    NSLog(@"dialogDescrition:%@", [dialog description]);
-//    
-//    if(postToFacebookSuccess)
-//    {
-//        [self.btnNext setHidden:YES];
-//        [self showConfirmMessage:@"Your Haiku has been Brewed!" withColor:[UIColor greenColor]];
-//    }
-//    
-//    
-//}
-//
-//-(void)dialogCompleteWithUrl:(NSURL *)url
-//{
-//    if (![url query]) {
-//        NSLog(@"User canceled dialog or there was an error");
-//        postToFacebookSuccess = false;
-//        [self showConfirmMessage:@"Facebook Request has not been sent" withColor:[UIColor yellowColor]];
-//        return;
-//    }
-//    else {
-//        postToFacebookSuccess = true;
-//        return;
-//
-//    }
-//    
-//    
-//    
-//}
-//
-//
-//-(void)dialogDidNotComplete:(FBDialog *)dialog
-//{
-//    NSLog(@"dialogDidNotComplete:");
-//    postToFacebookSuccess = false;
-//     [self showConfirmMessage:@"Facebook Request has not been sent" withColor:[UIColor yellowColor]];
-//}
-//
-//-(void)dialogDidNotCompleteWithUrl:(NSURL *)url
-//{
-//    NSLog(@"dialogDidNotCompleteWithUrl:");
-//    postToFacebookSuccess = false;
-//   [self showConfirmMessage:@"Facebook Request has not been sent" withColor:[UIColor yellowColor]];
-//}
-//
-//-(void)dialog:(FBDialog *)dialog didFailWithError:(NSError *)error
-//{
-//    NSLog(@"didFailWithError:");
-//    postToFacebookSuccess = false;
-//    [self showConfirmMessage:@"There was a problem communicating with Facebook" withColor:[UIColor redColor]];
-//}
 
 - (IBAction)pressBtnPlay:(id)sender {
     

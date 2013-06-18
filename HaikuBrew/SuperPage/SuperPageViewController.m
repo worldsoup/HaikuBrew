@@ -594,33 +594,34 @@ double oldY = 0;
             [self displayMessageViewController:@"Please enter line 3"];
             return;
         }
-        GetBaseDataManager *manager = [[GetBaseDataManager alloc] init];
-        [manager setUpdateDelegate:self];
-        [manager updateHaikuLineThree:self.haiku];
-        [self.confirmCancelToolbar setHidden:YES];
-        [self.takePhotoToolbar setHidden:YES];
-        [self.btnPostToFacebook setHidden:NO];
-        
-        [self.haikuEntryPanel.lbHaikuLine3 setText:self.haikuEntryPanel.tfHaikuLine3.text];
-        [self.haikuEntryPanel.lbHaikuLine3 setHidden:NO];
-        [self.haikuEntryPanel.tfHaikuLine3 setHidden:YES];
-        [self.haikuEntryPanel colorLineBackground:self.haikuEntryPanel.lbHaikuLine3 withColor:[UIColor colorWithRed:86.0/255.0 green:149.0/255.0 blue:182.0/255.0 alpha:0.9]];
-        [self.shareToolbar setHidden:NO];
-        
+        else {
+            GetBaseDataManager *manager = [[GetBaseDataManager alloc] init];
+            [manager setUpdateDelegate:self];
+            [manager updateHaikuLineThree:self.haiku];
+            [self.confirmCancelToolbar setHidden:YES];
+            [self.takePhotoToolbar setHidden:YES];
+            [self.btnPostToFacebook setHidden:NO];
+            
+            [self.haikuEntryPanel.lbHaikuLine3 setText:self.haikuEntryPanel.tfHaikuLine3.text];
+            [self.haikuEntryPanel.lbHaikuLine3 setHidden:NO];
+            [self.haikuEntryPanel.tfHaikuLine3 setHidden:YES];
+
+            [self.haikuEntryPanel colorLineBackground:self.haikuEntryPanel.lbHaikuLine3 withColor:[UIColor colorWithRed:86.0/255.0 green:149.0/255.0 blue:182.0/255.0 alpha:0.9]];
+            [self.shareToolbar setHidden:NO];
+            
+        }
     }
-    else {
+//    else {
         SelectFacebookFriendViewController *controller = [[SelectFacebookFriendViewController alloc] initWithNibName:@"SelectFacebookFriendViewController_iPhone" bundle:nil];
         [controller setIsUpdate:!self.isCaptureMode];
         if(self.isCaptureMode)
             [self.haiku setBackGroundImageData:self.uivPreviewView.image];
         
-        
         self.haiku.yPosition = [NSNumber numberWithInt:self.haikuEntryPanel.view.frame.origin.y];
         [controller setHaiku:self.haiku];
         [self.navigationController pushViewController:controller animated:YES];
-    }
+//    }
     NSLog(@"Here");
-
 }
 
 - (IBAction)cancelImage:(id)sender {
@@ -1088,7 +1089,7 @@ double oldY = 0;
 {
     NSLog(@"UPDATED SUCCEED");
 
-     [self.spinnerViewController dismissSpinner];
+    [self.spinnerViewController dismissSpinner];
     [self displayMessageViewController:@"Your Haiku has been brewed"];
     [self.confirmCancelToolbar setHidden:YES];
         [self.takePhotoToolbar setHidden:YES];
@@ -1097,7 +1098,8 @@ double oldY = 0;
         [self.haikuEntryPanel.lbHaikuLine3 setText:self.haikuEntryPanel.tfHaikuLine3.text];
         [self.haikuEntryPanel.lbHaikuLine3 setHidden:NO];
         [self.haikuEntryPanel.tfHaikuLine3 setHidden:YES];
-    [self.haiku.haikuLine3 setIsComplete:YES];
+
+        [self.haiku.haikuLine3 setIsComplete:YES];
     
     
     for (id view in self.navigationController.viewControllers) {
@@ -1134,10 +1136,6 @@ double oldY = 0;
 -(IBAction)showActionSheet:(id)sender {
     
 }
-
-
-
-
 
 -(void) displayMessageViewController:(NSString *) _message
 {

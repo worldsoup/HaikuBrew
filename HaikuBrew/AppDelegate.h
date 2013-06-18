@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "HomePageViewController.h"
 #import "NewHomeViewController.h"
-#import <FacebookSDK/FacebookSDK.h>
+
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
@@ -27,5 +27,6 @@
 
 @property (strong, nonatomic) FBSession *session;
 
+@property (strong, nonatomic) FBRequest *request;
 
 @end
